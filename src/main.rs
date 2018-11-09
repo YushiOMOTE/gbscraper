@@ -87,12 +87,7 @@ fn modify(s: &str) -> String {
     let s = s.to_lowercase();
     let re = Regex::new(r"(?P<v>[0-9a-zA-Z]+)h").expect("Invalid regex");
 
-    re.replace_all(&s, "0x$v")
-        .replace("d8", "n")
-        .replace("d16", "nn")
-        .replace("a8", "n")
-        .replace("a16", "nn")
-        .replace("r8", "n")
+    re.replace_all(&s, "0x$v").to_string()
 }
 
 lazy_static! {
