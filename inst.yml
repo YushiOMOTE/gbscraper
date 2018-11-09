@@ -2603,7 +2603,7 @@
 - code: 226
   operator: ld
   operands:
-    - (c)
+    - (0xff00+c)
     - a
   bits: 8
   size: 2

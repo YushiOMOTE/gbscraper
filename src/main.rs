@@ -66,7 +66,7 @@ lazy_static! {
     static ref ALT: HashMap<&'static str, &'static str> = {
         let mut m = HashMap::new();
         m.insert("LD A,(C)", "LD A,(FF00h+C)");
-        m.insert("LD C,(A)", "LD (FF00h+C),A");
+        m.insert("LD (C),A", "LD (FF00h+C),A");
         m.insert("LDH A,(a8)", "LD A,(FF00h+a8)");
         m.insert("LDH (a8),A", "LD (FF00h+a8),A");
         m.insert("LD A,(HL+)", "LDI A,(HL)");
