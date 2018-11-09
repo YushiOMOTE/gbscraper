@@ -62,6 +62,22 @@ impl From<std::io::Error> for Error {
     }
 }
 
+lazy_static! {
+    static ref ALT: HashMap<&'static str, &'static str> = {
+        let mut m = HashMap::new();
+        m.insert("LD A,(C)", "LD A,(FF00h+C)");
+        m.insert("LD C,(A)", "LD (FF00h+C),A");
+        m.insert("LDH A,(a8)", "LD A,(FF00h+a8)");
+        m.insert("LDH (a8),A", "LD (FF00h+a8),A");
+        m.insert("LD A,(HL+)", "LDI A,(HL)");
+        m.insert("LD (HL+),A", "LDI (HL),A");
+        m.insert("LD A,(HL-)", "LDD A,(HL)");
+        m.insert("LD (HL-),A", "LDD (HL),A");
+        m.insert("LD HL,SP+r8", "LDHL SP,r8");
+        m
+    };
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(untagged)]
 enum Time {
@@ -135,7 +151,7 @@ fn parse_table(table: ElementRef, op_prefix: u16) -> Vec<Instruction> {
             .get(item.value().attr("bgcolor").unwrap_or(""))
             .unwrap_or(&0);
 
-        let s = item.inner_html();
+        let s = alter(&item.inner_html());
 
         let code = ((y - 1) << 4 | (x - 1)) as u16 | (op_prefix << 8);
 
