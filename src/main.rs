@@ -99,11 +99,20 @@ struct Instruction {
     c: String,
 }
 
-fn modify(s: &str) -> String {
-    let s = s.to_lowercase();
-    let re = Regex::new(r"(?P<v>[0-9a-zA-Z]+)h").expect("Invalid regex");
+fn alter(s: &str) -> String {
+    ALT.iter().fold(s.to_string(), |s, (k, v)| s.replace(k, v))
+}
 
-    re.replace_all(&s, "0x$v").to_string()
+fn modify(code: u16, s: &str) -> String {
+    let s = s.to_lowercase();
+
+    if s == "c" && (code == 0xd8 || code == 0xda || code == 0xdc) {
+        // Special cases: conditional jump and returns
+        "cf".to_string()
+    } else {
+        let re = Regex::new(r"(?P<v>[0-9a-zA-Z]+)h").expect("Invalid regex");
+        re.replace_all(&s, "0x$v").to_string()
+    }
 }
 
 lazy_static! {
@@ -173,7 +182,7 @@ fn parse_table(table: ElementRef, op_prefix: u16) -> Vec<Instruction> {
 
         let mut ops = mnem.into_inner();
         let operator = ops.next().expect("No operator").as_str().to_lowercase();
-        let operands = ops.map(|p| modify(p.as_str())).collect::<Vec<_>>();
+        let operands = ops.map(|p| modify(code, p.as_str())).collect::<Vec<_>>();
 
         let size: usize = p.next()
             .expect("No size")
